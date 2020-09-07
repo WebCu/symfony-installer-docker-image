@@ -11,14 +11,19 @@ RUN pecl install xdebug-2.8.1 \
 
 # Install components
 RUN apt-get update -y && apt-get install -y \
-		git \
-		unzip \
-		zip \
-		# This package includes mbstring
-		libonig-dev \
+	git \
+	unzip \
+	zip \
+	# This package includes mbstring
+	libonig-dev \
+  # Add Intl extenxions
+  libicu-dev \
 	--no-install-recommends && \
 	apt-get autoremove -y && \
 	rm -r /var/lib/apt/lists/*
+
+RUN docker-php-ext-configure intl \
+  && docker-php-ext-install intl
 
 # Install Composer
 RUN set -eux; \
