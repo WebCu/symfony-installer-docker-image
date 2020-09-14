@@ -1,6 +1,25 @@
 FROM php:7.4-cli
 
-# Install xDebug
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+COPY ./php/php-custom.ini /usr/local/etc/php/conf.d/php-custom.ini
+
+### Install components ###
+RUN apt-get update -y && apt-get install -y \
+  git \
+  unzip \
+  zip \
+  # This package includes mbstring
+  libonig-dev \
+  # Add Intl extenxions
+  libicu-dev \
+  --no-install-recommends && \
+  apt-get autoremove -y && \
+  rm -r /var/lib/apt/lists/*
+
+### Install OPcache ###
+RUN docker-php-ext-install opcache
+
+### Install xDebug ###
 
 # If you're behind a corporate proxy uncomment the line below
 # RUN pear config-set http_proxy http://proxy.company:000
@@ -9,23 +28,11 @@ RUN pecl channel-update pecl.php.net
 RUN pecl install xdebug-2.8.1 \
     && docker-php-ext-enable xdebug
 
-# Install components
-RUN apt-get update -y && apt-get install -y \
-	git \
-	unzip \
-	zip \
-	# This package includes mbstring
-	libonig-dev \
-  # Add Intl extenxions
-  libicu-dev \
-	--no-install-recommends && \
-	apt-get autoremove -y && \
-	rm -r /var/lib/apt/lists/*
-
+### Install Intl ###
 RUN docker-php-ext-configure intl \
   && docker-php-ext-install intl
 
-# Install Composer
+### Install Composer ###
 RUN set -eux; \
   curl --silent --fail --location --retry 3 --output /tmp/installer.php --url https://raw.githubusercontent.com/composer/getcomposer.org/cb19f2aa3aeaa2006c0cd69a7ef011eb31463067/web/installer; \
   php -r " \
@@ -41,6 +48,6 @@ RUN set -eux; \
   rm -f /tmp/installer.php; \
   find /tmp -type d -exec chmod -v 1777 {} +
 
-# Install Symfony Installer
+### Install Symfony Installer ###
 RUN curl -sS https://get.symfony.com/cli/installer | bash; \
     mv /root/.symfony/bin/symfony /usr/local/bin/symfony
