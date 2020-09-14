@@ -1,7 +1,7 @@
 FROM php:7.4-cli
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-COPY ./php/php-custom.ini /usr/local/etc/php/conf.d/php-custom.ini
+COPY ./php/custom.ini /usr/local/etc/php/conf.d/php-custom.ini
 
 ### Install components ###
 RUN apt-get update -y && apt-get install -y \
