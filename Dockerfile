@@ -51,3 +51,5 @@ RUN set -eux; \
 ### Install Symfony Installer ###
 RUN curl -sS https://get.symfony.com/cli/installer | bash; \
     mv /root/.symfony/bin/symfony /usr/local/bin/symfony
+
+EXPOSE 80 443
